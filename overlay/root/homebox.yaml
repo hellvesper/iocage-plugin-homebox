@@ -1,0 +1,176 @@
+---
+- name: Install Required Software
+  hosts: localhost
+  become: no # Run tasks with sudo
+
+  tasks:
+    - name: Enable nginx service
+      command: sysrc -f /etc/rc.conf nginx_enable=YES
+      become: yes
+
+    - name: Install pnpm using npm
+      command: npm install -g pnpm
+      become: yes
+
+    - name: Download and install Go 1.22.0
+      command: go install golang.org/dl/go1.22.0@latest
+      become: yes
+
+    - name: Download Go dependencies
+      command: /root/go/bin/go1.22.0 download
+      become: yes
+
+    - name: Create symbolic links for Go binaries
+      command: ln -s /root/sdk/go1.22.0/bin/{{ item }} /usr/local/bin/{{ item }}122
+      with_items:
+        - go
+        - gofmt
+      become: yes
+
+    - name: Fetch homebox source code
+      command: git clone https://github.com/hay-kot/homebox.git
+      become: yes
+
+    # - name: Extract nginx-ui source code
+    #   command: tar -xf v2.0.0-beta.14.tar.gz
+    #   become: yes
+
+    # - name: Rename nginx-ui directory
+    #   command: mv nginx-ui-2.0.0-beta.14 nginx-ui
+    #   become: yes
+
+    # - name: Apply FreeBSD patch to package.json
+    #   command: sed -i .bak '1 r /root/fix_package_json.sed' package.json
+    #   args:
+    #     chdir: /root/nginx-ui/app
+    #   become: yes
+
+    - name: Install UI dependencies
+      command: pnpm install --frozen-lockfile --shamefully-hoist
+      args:
+        chdir: /root/homebox/frontend
+      become: yes
+
+    - name: Build UI
+      command: pnpm build
+      args:
+        chdir: /root/homebox/frontend
+      become: yes
+
+    # - name: Move pre-builded nginx-ui binaries
+    #   command: cp /root/nginxui_precompiled/nginx-ui /root/nginx-ui/
+    #   args:
+    #     chdir: /root/nginx-ui
+    #   become: yes
+
+    # - name: Fetch nginx-ui binary
+    #   command: fetch https://transfer.sh/LD9tEazX7E/nginx-ui
+    #   args:
+    #     chdir: /root/nginx-ui
+    #   become: yes
+
+    # - name: Set exec flag
+    #   command: chmod +x nginx-ui
+    #   args:
+    #     chdir: /root/nginx-ui
+    #   become: yes
+
+    - name: Get HomeBox Go dependencies
+      command: go122 get -d -v ./...
+      args:
+        chdir: /root/homebox/backend
+      become: yes
+
+    - name: rm public dir if any
+      command: rm -rf ./app/api/public
+      args:
+        chdir: /root/homebox/backend
+      become: yes
+
+    - name: Prepare frontend static
+      command: cp -r /root/homebox/frontend/.output/public/ /root/homebox/backend/app/api/static/public/
+      args:
+        chdir: /root/homebox/backend
+      become: yes
+
+    - name: Build homebox with Go
+      command: CGO_ENABLED=0 GOOS=freebsd go122 build -ldflags "-s -w -X main.commit=$COMMIT -X main.buildTime=$BUILD_TIME -X main.version=$VERSION"  -o ./go/bin/api -v ./app/api/*.go
+      args:
+        chdir: /root/homebox/backend
+      become: yes
+
+    - name: Create app dir
+      command: mkdir /root/homebox/app
+      become: yes
+
+    - name: Copy executable
+      command: cp backend/go/bin/api ./app/
+      args:
+        chdir: /root/homebox
+      become: yes
+
+    - name: Make it executable
+      command: chmod +x ./app/api/
+      args:
+        chdir: /root/homebox
+      become: yes
+
+    - name: Create data directory
+      command: mkdir data
+      args:
+        chdir: /root/homebox
+      become: yes
+
+    # - name: Start nginx-ui service
+    #   command: nginx-ui -config app.ini
+    #   args:
+    #     chdir: /root/nginx-ui
+    #   become: yes
+
+    # - name: Enable nginx-ui service
+    #   command: sysrc -f /etc/rc.conf nginx_ui_enable=YES
+    #   become: yes
+
+    - name: Enable mDNSResponser service
+      command: sysrc -f /etc/rc.conf mdnsresponderposix_enable=YES
+      become: yes
+
+    - name: Set config for mDNSResponser service
+      command: sysrc -f /etc/rc.conf mdnsresponderposix_flags="-f /usr/local/etc/mdnsresponder.conf"
+      become: yes
+
+    # - name: Fix site-available/enable folders in Nginx
+    #   command: bsd-nginx-sites/nginx-sites.sh
+    #   args:
+    #     chdir: /root
+    #   become: yes
+
+    # - name: Add nginx-ui Nginx virtual server config
+    #   command: cp nginxui.conf /usr/local/etc/nginx/site-available/
+    #   args:
+    #     chdir: /root
+    #   become: yes
+
+    # - name: Add recomended proxy params
+    #   command: cp proxy_params /usr/local/etc/nginx/
+    #   args:
+    #     chdir: /root
+    #   become: yes
+
+    # - name: Enable nginx-ui site
+    #   command: ln -s nginxui.conf /usr/local/etc/nginx/sites-available/nginxui.conf /usr/local/etc/nginx/sites-enabled/
+    #   args:
+    #     chdir: /root
+    #   become: yes
+
+    # - name: Start nginx service
+    #   command: service nginx start
+    #   become: yes
+
+    # - name: Start nginx-ui service
+    #   command: service nginx-ui start
+    #   become: yes
+
+    - name: Start mDNSResponser service
+      command: service mdnsresponderposix start
+      become: yes

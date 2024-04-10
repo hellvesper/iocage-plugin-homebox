@@ -1,0 +1,41 @@
+#!/bin/sh
+#
+# PROVIDE: homebox
+# REQUIRE: LOGIN
+# KEYWORD: shutdown
+
+. /etc/rc.subr
+
+
+name="homebox"
+rc_cmd="$1"
+command="/root/homebox/app/api"
+command_args="/root/homebox/data/config.yml"
+pidfile="/var/run/${name}.pid"
+
+homebox_env() {
+    export HBOX_MODE=production
+    export HBOX_STORAGE_DATA=/root/homebox/data/
+    export HBOX_STORAGE_SQLITE_URL="/root/homebox/data/homebox.db?_pragma=busy_timeout=2000&_pragma=journal_mode=WAL&_fk=1"
+}
+
+homebox_start() {
+    ebegin "Starting ${name}"
+    homebox_env
+    start-stop-daemon --start --exec ${command} -- ${command_args}
+    eend $?
+}
+
+homebox_stop() {
+    ebegin "Stopping ${name}"
+    start-stop-daemon --stop --quiet --pidfile ${pidfile}
+    eend $?
+}
+
+homebox_status() {
+    homebox_env
+    start-stop-daemon --status --pidfile ${pidfile}
+}
+
+load_rc_config $name
+run_rc_command "$1"
