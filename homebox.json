@@ -7,7 +7,16 @@
   "properties": {
     "dhcp": 1
   },
-  "pkgs": ["go", "git", "node", "npm", "mDNSResponder"],
+  "pkgs": [
+    "go",
+    "git",
+    "node",
+    "npm",
+    "python",
+    "python39",
+    "py39-pip",
+    "mDNSResponder"
+  ],
   "packagesite": "https://pkg.freebsd.org/${ABI}/latest",
   "fingerprints": {
     "iocage-plugins": [
