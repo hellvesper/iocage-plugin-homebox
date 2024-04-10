@@ -94,7 +94,10 @@
       become: yes
 
     - name: Build homebox with Go
-      command: CGO_ENABLED=0 GOOS=freebsd go122 build -ldflags "-s -w -X main.commit=$COMMIT -X main.buildTime=$BUILD_TIME -X main.version=$VERSION"  -o ./go/bin/api -v ./app/api/*.go
+      command: go122 build -ldflags "-s -w -X main.commit=$COMMIT -X main.buildTime=$BUILD_TIME -X main.version=$VERSION"  -o ./go/bin/api -v ./app/api/*.go
+      environment:
+        CGO_ENABLED: 0
+        GOOS: "freebsd"
       args:
         chdir: /root/homebox/backend
       become: yes
