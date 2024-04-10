@@ -94,7 +94,7 @@
       become: yes
 
     - name: Build homebox with Go
-      command: go122 build -ldflags "-s -w -X main.commit=$COMMIT -X main.buildTime=$BUILD_TIME -X main.version=$VERSION"  -o ./go/bin/api -v ./app/api/*.go
+      command: go122 build -ldflags "-s -w -X main.commit=head -X main.buildTime=0001-01-01T00:00:00Z -X main.version='3.2'"  -o ./go/bin/api -v ./app/api/*.go
       environment:
         CGO_ENABLED: 0
         GOOS: "freebsd"
