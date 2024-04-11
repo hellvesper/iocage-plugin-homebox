@@ -33,8 +33,6 @@ echo "install Homebox"
 # cd ..
 # go122 build -o nginx-ui -v main.go
 # cp app.example.ini app.ini
-# echo "Enable nginx service"
-sysrc -f /etc/rc.conf nginx_enable=YES
 # echo "Install pnpm"
 npm install -g pnpm
 set status = $status
@@ -43,8 +41,11 @@ if ($status != 0) then
     # Optionally, exit or handle the error
     exit 1
 else
+    echo ""
     echo "pnmp install succeeded"
+    echo ""
 endif
+
 echo ""
 hash -r
 # echo "Install go1.22"
@@ -55,7 +56,9 @@ if ($status != 0) then
     # Optionally, exit or handle the error
     exit 1
 else
+    echo ""
     echo "Go122 install succeeded"
+    echo ""
 endif
 
 /root/go/bin/go1.22.0 download
@@ -65,7 +68,9 @@ if ($status != 0) then
     # Optionally, exit or handle the error
     exit 1
 else
+    echo ""
     echo "Go122 download succeeded"
+    echo ""
 endif
 
 ln -s /root/sdk/go1.22.0/bin/go /usr/local/bin/go122
@@ -75,7 +80,9 @@ if ($status != 0) then
     # Optionally, exit or handle the error
     #exit 1
 else
+    echo ""
     echo "Go122 linking succeeded"
+    echo ""
 endif
 
 ln -s /root/sdk/go1.22.0/bin/gofmt /usr/local/bin/gofmt122
@@ -85,7 +92,9 @@ if ($status != 0) then
     # Optionally, exit or handle the error
     #exit 1
 else
+    echo ""
     echo "gofmt122 linking succeeded"
+    echo ""
 endif
 hash -r
 # echo "Fetch and install HomeBox"
@@ -96,7 +105,9 @@ if ($status != 0) then
     # Optionally, exit or handle the error
     exit 1
 else
+    echo ""
     echo "Homebox download succeeded"
+    echo ""
 endif
 
 setenv NUXT_TELEMETRY_DISABLED 1 # disable telemetry request
@@ -107,7 +118,9 @@ if ($status != 0) then
     # Optionally, exit or handle the error
     exit 1
 else
+    echo ""
     echo "Frontend dependency install succeeded"
+    echo ""
 endif
 
 cd /root/homebox/frontend && pnpm build
@@ -117,7 +130,9 @@ if ($status != 0) then
     # Optionally, exit or handle the error
     exit 1
 else
+    echo ""
     echo "Frontend build succeeded"
+    echo ""
 endif
 
 cd /root/homebox/backend && go122 get -d -v ./...
@@ -127,7 +142,9 @@ if ($status != 0) then
     # Optionally, exit or handle the error
     exit 1
 else
+    echo ""
     echo "Backend dependency download succeeded"
+    echo ""
 endif
 
 cd /root/homebox/backend && rm -rf ./app/api/public
@@ -139,7 +156,9 @@ if ($status != 0) then
     # Optionally, exit or handle the error
     exit 1
 else
+    echo ""
     echo "Copy frontend static succeeded"
+    echo ""
 endif
 
 setenv CGO_ENABLED 0
@@ -155,7 +174,9 @@ if ($status != 0) then
     # Optionally, exit or handle the error
     exit 1
 else
+    echo ""
     echo "Backend build succeeded"
+    echo ""
 endif
 
 mkdir -p /root/homebox/app
@@ -166,7 +187,9 @@ if ($status != 0) then
     # Optionally, exit or handle the error
     exit 1
 else
+    echo ""
     echo "Copy app binary succeeded"
+    echo ""
 endif
 
 cd /root/homebox && chmod +x ./app/api/
@@ -178,9 +201,14 @@ if ($status != 0) then
     # Optionally, exit or handle the error
     exit 1
 else
+    echo ""
     echo "Copy app binary succeeded"
+    echo ""
 endif
 
+# echo "Enable nginx service"
+sysrc -f /etc/rc.conf nginx_enable=YES
+service nginx start
 sysrc -f /etc/rc.conf mdnsresponderposix_enable=YES
 sysrc -f /etc/rc.conf mdnsresponderposix_flags="-f /usr/local/etc/mdnsresponder.conf"
 service mdnsresponderposix start
