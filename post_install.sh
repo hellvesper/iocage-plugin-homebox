@@ -33,14 +33,16 @@ echo "install Homebox"
 # cd ..
 # go122 build -o nginx-ui -v main.go
 # cp app.example.ini app.ini
-
+echo "Enable nginx service"
 sysrc -f /etc/rc.conf nginx_enable=YES
+echo "Install pnpm"
 npm install -g pnpm
+echo "Install go1.22"
 go install golang.org/dl/go1.22.0@latest
 /root/go/bin/go1.22.0 download
-ln -s /root/sdk/go1.22.0/bin/{{ item }} /usr/local/bin/{{ item }}122
 ln -s /root/sdk/go1.22.0/bin/go /usr/local/bin/go122
 ln -s /root/sdk/go1.22.0/bin/gofmt /usr/local/bin/gofmt122
+echo "Fetch and install HomeBox"
 git clone https://github.com/hay-kot/homebox.git
 setenv NUXT_TELEMETRY_DISABLED 1 # disable telemetry request
 cd /root/homebox/frontend && pnpm install --frozen-lockfile --shamefully-hoist
