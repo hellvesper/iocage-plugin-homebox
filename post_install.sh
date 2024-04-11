@@ -42,6 +42,7 @@ ln -s /root/sdk/go1.22.0/bin/{{ item }} /usr/local/bin/{{ item }}122
 ln -s /root/sdk/go1.22.0/bin/go /usr/local/bin/go122
 ln -s /root/sdk/go1.22.0/bin/gofmt /usr/local/bin/gofmt122
 git clone https://github.com/hay-kot/homebox.git
+setenv NUXT_TELEMETRY_DISABLED 1 # disable telemetry request
 cd /root/homebox/frontend && pnpm install --frozen-lockfile --shamefully-hoist
 cd /root/homebox/frontend && pnpm build
 cd /root/homebox/backend && go122 get -d -v ./...
