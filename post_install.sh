@@ -48,6 +48,7 @@ endif
 
 echo ""
 hash -r
+rehash
 # echo "Install go1.22"
 go install golang.org/dl/go1.22.0@latest
 set status = $status
@@ -97,6 +98,7 @@ else
     echo ""
 endif
 hash -r
+rehash
 # echo "Fetch and install HomeBox"
 cd /root && git clone https://github.com/hay-kot/homebox.git
 set status = $status
