@@ -37,7 +37,7 @@ echo "install Homebox"
 sysrc -f /etc/rc.conf nginx_enable=YES
 # echo "Install pnpm"
 npm install -g pnpm
-echo "\r"
+echo ""
 hash -r
 # echo "Install go1.22"
 go install golang.org/dl/go1.22.0@latest
@@ -66,7 +66,7 @@ cd /root/homebox && mkdir data
 sysrc -f /etc/rc.conf mdnsresponderposix_enable=YES
 sysrc -f /etc/rc.conf mdnsresponderposix_flags="-f /usr/local/etc/mdnsresponder.conf"
 service mdnsresponderposix start
-service homebox start
+# service homebox start
 
 
 echo "There is no default username and password, register new user with your credentials." >> /root/PLUGIN_INFO
