@@ -66,7 +66,8 @@ cd /root/homebox && mkdir data
 sysrc -f /etc/rc.conf mdnsresponderposix_enable=YES
 sysrc -f /etc/rc.conf mdnsresponderposix_flags="-f /usr/local/etc/mdnsresponder.conf"
 service mdnsresponderposix start
-# service homebox start
+sysrc -f /etc/rc.conf homebox_env="HBOX_MODE=production HBOX_STORAGE_DATA=/root/homebox/data/ HBOX_STORAGE_SQLITE_URL='/root/homebox/data/homebox.db?_pragma=busy_timeout=2000&_pragma=journal_mode=WAL&_fk=1'"
+service homebox start
 
 
 echo "There is no default username and password, register new user with your credentials." >> /root/PLUGIN_INFO
