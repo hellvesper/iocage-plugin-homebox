@@ -37,35 +37,154 @@ echo "install Homebox"
 sysrc -f /etc/rc.conf nginx_enable=YES
 # echo "Install pnpm"
 npm install -g pnpm
+set status = $status
+if ($status != 0) then
+    echo "pnmp install failed"
+    # Optionally, exit or handle the error
+    exit 1
+else
+    echo "pnmp install succeeded"
+endif
 echo ""
 hash -r
 # echo "Install go1.22"
 go install golang.org/dl/go1.22.0@latest
+set status = $status
+if ($status != 0) then
+    echo "Go122 install failed"
+    # Optionally, exit or handle the error
+    exit 1
+else
+    echo "Go122 install succeeded"
+endif
+
 /root/go/bin/go1.22.0 download
+set status = $status
+if ($status != 0) then
+    echo "Go122 download failed"
+    # Optionally, exit or handle the error
+    exit 1
+else
+    echo "Go122 download succeeded"
+endif
+
 ln -s /root/sdk/go1.22.0/bin/go /usr/local/bin/go122
+set status = $status
+if ($status != 0) then
+    echo "Go122 linkning failed"
+    # Optionally, exit or handle the error
+    #exit 1
+else
+    echo "Go122 linking succeeded"
+endif
+
 ln -s /root/sdk/go1.22.0/bin/gofmt /usr/local/bin/gofmt122
+set status = $status
+if ($status != 0) then
+    echo "gofmt122 linking failed"
+    # Optionally, exit or handle the error
+    #exit 1
+else
+    echo "gofmt122 linking succeeded"
+endif
 hash -r
 # echo "Fetch and install HomeBox"
 cd /root && git clone https://github.com/hay-kot/homebox.git
+set status = $status
+if ($status != 0) then
+    echo "Homebox download failed"
+    # Optionally, exit or handle the error
+    exit 1
+else
+    echo "Homebox download succeeded"
+endif
+
 setenv NUXT_TELEMETRY_DISABLED 1 # disable telemetry request
 cd /root/homebox/frontend && pnpm install --frozen-lockfile --shamefully-hoist
+set status = $status
+if ($status != 0) then
+    echo "Frontend dependency install failed"
+    # Optionally, exit or handle the error
+    exit 1
+else
+    echo "Frontend dependency install succeeded"
+endif
+
 cd /root/homebox/frontend && pnpm build
+set status = $status
+if ($status != 0) then
+    echo "Frontend build failed"
+    # Optionally, exit or handle the error
+    exit 1
+else
+    echo "Frontend build succeeded"
+endif
+
 cd /root/homebox/backend && go122 get -d -v ./...
+set status = $status
+if ($status != 0) then
+    echo "Backend dependency download failed"
+    # Optionally, exit or handle the error
+    exit 1
+else
+    echo "Backend dependency download succeeded"
+endif
+
 cd /root/homebox/backend && rm -rf ./app/api/public
+
 cd /root/homebox/backend && cp -r /root/homebox/frontend/.output/public/ /root/homebox/backend/app/api/static/public/
+set status = $status
+if ($status != 0) then
+    echo "Copy frontend static failed"
+    # Optionally, exit or handle the error
+    exit 1
+else
+    echo "Copy frontend static succeeded"
+endif
+
 setenv CGO_ENABLED 0
 setenv GOOS freebsd
 go122 build \
       -ldflags "-s -w -X main.commit=head -X main.buildTime=0001-01-01T00:00:00Z -X main.version='3.2'" \
       -o ./go/bin/api \
       -v ./app/api/*.go
-mkdir /root/homebox/app
+
+set status = $status
+if ($status != 0) then
+    echo "Backend build failed"
+    # Optionally, exit or handle the error
+    exit 1
+else
+    echo "Backend build succeeded"
+endif
+
+mkdir -p /root/homebox/app
 cd /root/homebox && cp backend/go/bin/api ./app/
+set status = $status
+if ($status != 0) then
+    echo "Copy app binary failed"
+    # Optionally, exit or handle the error
+    exit 1
+else
+    echo "Copy app binary succeeded"
+endif
+
 cd /root/homebox && chmod +x ./app/api/
-cd /root/homebox && mkdir data
+
+cd /root/homebox && mkdir -p /root/homebox/data
+set status = $status
+if ($status != 0) then
+    echo "Copy app binary failed"
+    # Optionally, exit or handle the error
+    exit 1
+else
+    echo "Copy app binary succeeded"
+endif
+
 sysrc -f /etc/rc.conf mdnsresponderposix_enable=YES
 sysrc -f /etc/rc.conf mdnsresponderposix_flags="-f /usr/local/etc/mdnsresponder.conf"
 service mdnsresponderposix start
+sysrc -f /etc/rc.conf homebox_enable=YES
 sysrc -f /etc/rc.conf homebox_env="HBOX_MODE=production HBOX_STORAGE_DATA=/root/homebox/data/ HBOX_STORAGE_SQLITE_URL='/root/homebox/data/homebox.db?_pragma=busy_timeout=2000&_pragma=journal_mode=WAL&_fk=1'"
 service homebox start
 
