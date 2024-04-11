@@ -1,5 +1,5 @@
 #!/bin/sh
-
+#
 # PROVIDE: homebox
 # REQUIRE: LOGIN
 # KEYWORD: shutdown
@@ -8,35 +8,34 @@
 
 name="homebox"
 rcvar="homebox_enable"
-start_cmd="${name}_start"
-stop_cmd="${name}_stop"
-
-homebox_enable=${homebox_enable-"NO"}
 
 load_rc_config $name
 
-: ${homebox_pidfile="/var/run/${name}.pid"}
-
-#setenv HBOX_MODE "production"
-#setenv HBOX_STORAGE_DATA "/root/homebox/data/"
-#setenv HBOX_STORAGE_SQLITE_URL "/root/homebox/data/homebox.db?_pragma=busy_timeout=2000&_pragma=journal_mode=WAL&_fk=1"
+: ${homebox_enable="NO"}
 
 command="/root/homebox/app/api"
 command_args="/root/homebox/data/config.yml"
+pidfile="/var/run/${name}.pid"
+logfile="/var/log/${name}.log"
+
+procname="${command}"
+
+command_interpreter="/usr/sbin/daemon"
+
+start_cmd="${name}_start"
+stop_cmd="${name}_stop"
 
 homebox_start() {
     echo "Starting ${name}."
     echo "$HBOX_STORAGE_DATA"
     echo "$HBOX_MODE"
     echo "$HBOX_STORAGE_SQLITE_URL"
-    ${command} ${command_args} &
-    echo $! > ${homebox_pidfile}
+    ${command_interpreter} -o ${logfile} -P ${pidfile} -- ${command} ${command_args}
 }
 
 homebox_stop() {
     echo "Stopping ${name}."
-    kill `cat ${homebox_pidfile}`
-    rm ${homebox_pidfile}
+    kill -TERM $(cat ${pidfile})
 }
 
 run_rc_command "$1"
