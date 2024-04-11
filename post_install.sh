@@ -37,11 +37,13 @@ echo "install Homebox"
 sysrc -f /etc/rc.conf nginx_enable=YES
 # echo "Install pnpm"
 npm install -g pnpm
+hash -r
 # echo "Install go1.22"
 go install golang.org/dl/go1.22.0@latest
 /root/go/bin/go1.22.0 download
 ln -s /root/sdk/go1.22.0/bin/go /usr/local/bin/go122
 ln -s /root/sdk/go1.22.0/bin/gofmt /usr/local/bin/gofmt122
+hash -r
 # echo "Fetch and install HomeBox"
 cd /root && git clone https://github.com/hay-kot/homebox.git
 setenv NUXT_TELEMETRY_DISABLED 1 # disable telemetry request
