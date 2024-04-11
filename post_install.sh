@@ -47,6 +47,8 @@ cd /root/homebox/frontend && pnpm build
 cd /root/homebox/backend && go122 get -d -v ./...
 cd /root/homebox/backend && rm -rf ./app/api/public
 cd /root/homebox/backend && cp -r /root/homebox/frontend/.output/public/ /root/homebox/backend/app/api/static/public/
+setenv CGO_ENABLED 0
+setenv GOOS freebsd
 CGO_ENABLED=0 GOOS=freebsd go122 build \
       -ldflags "-s -w -X main.commit=head -X main.buildTime=0001-01-01T00:00:00Z -X main.version='3.2'" \
       -o ./go/bin/api \
