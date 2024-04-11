@@ -37,6 +37,7 @@ echo "install Homebox"
 sysrc -f /etc/rc.conf nginx_enable=YES
 # echo "Install pnpm"
 npm install -g pnpm
+echo "\r"
 hash -r
 # echo "Install go1.22"
 go install golang.org/dl/go1.22.0@latest
@@ -54,7 +55,7 @@ cd /root/homebox/backend && rm -rf ./app/api/public
 cd /root/homebox/backend && cp -r /root/homebox/frontend/.output/public/ /root/homebox/backend/app/api/static/public/
 setenv CGO_ENABLED 0
 setenv GOOS freebsd
-CGO_ENABLED=0 GOOS=freebsd go122 build \
+go122 build \
       -ldflags "-s -w -X main.commit=head -X main.buildTime=0001-01-01T00:00:00Z -X main.version='3.2'" \
       -o ./go/bin/api \
       -v ./app/api/*.go
