@@ -1,6 +1,11 @@
 # iocage-plugin-homebox
 
-Artifact files for homebox iocage plugin
+Artifact files for Homebox iocage plugin
+
+site: https://hay-kot.github.io/homebox/
+github: https://github.com/hay-kot/homebox
+
+The plugin script will install latest version from master branch of app repository
 
 To install:
 
